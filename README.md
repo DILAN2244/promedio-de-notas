@@ -1,25 +1,19 @@
 # Promedio de Notas
 
-## Descripción
-Promedio de Notas es una aplicación web para calcular y consultar el promedio académico de diferentes evaluaciones.
+Aplicación web progresiva (PWA) para calcular promedios académicos. Funciona en móvil y computador y puede instalarse desde el navegador.
 
-## ¿Qué problema resuelve?
-Facilita el cálculo de notas parciales y definitivas, evitando realizar las operaciones manualmente. También ayuda a conocer qué calificación se necesita para alcanzar la nota mínima de aprobación.
+## Publicación
+1. En GitHub abre **Settings → Pages**.
+2. En **Build and deployment**, selecciona **Deploy from a branch**.
+3. Selecciona la rama **main** y la carpeta **/(root)**; guarda.
+4. Espera a que GitHub Pages publique el sitio.
 
-## Tecnologías utilizadas
-- HTML5: estructura de la aplicación.
-- CSS3: estilos y presentación visual.
-- JavaScript: validaciones y cálculos.
-- LocalStorage: almacenamiento de datos en el navegador.
-- Google Fonts: tipografías.
+La dirección será: https://dilan2244.github.io/promedio-de-notas/
 
-## ¿Cómo usarlo?
-1. Abre el archivo `Promedio de Notas.html` en un navegador.
-2. Selecciona el tipo de promedio: notas con el mismo valor o con porcentajes.
-3. Ingresa los nombres y las calificaciones.
-4. Agrega o elimina evaluaciones según sea necesario.
-5. Consulta el promedio calculado y el estado académico.
+## Instalación
+Abre el enlace publicado desde Chrome/Edge y usa **Instalar aplicación** o **Añadir a pantalla de inicio**. En iPhone, usa Compartir → Añadir a pantalla de inicio.
 
-## Escala de calificación
-- Rango: 0.0 a 5.0.
-- Nota mínima de aprobación: 3.0.
+## Tecnologías
+HTML, CSS, JavaScript, LocalStorage, Web App Manifest y Service Worker.
+
+**Privacidad:** las notas se almacenan localmente en el navegador y no se sincronizan entre dispositivos.

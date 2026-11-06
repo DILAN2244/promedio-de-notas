@@ -1,0 +1,18 @@
+{
+  "name": "Promedio de Notas",
+  "short_name": "Mis Notas",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f6fc",
+  "theme_color": "#172554",
+  "description": "Calculadora de promedio académico",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
