@@ -7,7 +7,7 @@ Calculadora académica gratuita y aplicación web progresiva (PWA).
 - Promedio ponderado por porcentajes.
 - Estimación de la nota promedio necesaria para alcanzar 3.0.
 - Guardado local en el navegador.
-- Exportación de notas a CSV.
+- Exportación de notas a CSV.\n- Guía educativa con ejemplos y preguntas frecuentes.
 - Diseño adaptable a celular y computador.
 - Caché para uso sin conexión después de la primera visita.
 
