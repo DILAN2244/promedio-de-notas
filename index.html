@@ -1,26 +1,309 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#172554"><meta name="description" content="Calcula tu promedio académico y descubre qué nota necesitas para aprobar.">
-<link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml">
-<title>Promedio de Notas</title>
-<style>
-:root{color-scheme:light;--bg:#f3f6fc;--card:#fff;--ink:#172554;--muted:#64748b;--line:#dbe3f0;--accent:#3157d5;--soft:#eaf0ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:850px;margin:auto;padding:28px 16px 50px}header{text-align:center;margin:10px 0 24px}header h1{margin:0;font-size:clamp(28px,5vw,40px)}header p{color:var(--muted);margin:8px 0}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;margin:14px 0;box-shadow:0 8px 28px #1725540a}.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.mode{display:flex;gap:10px;flex-wrap:wrap}.mode label{background:var(--soft);padding:10px 14px;border-radius:12px}button,select,input{font:inherit}button{border:0;border-radius:12px;padding:11px 16px;background:var(--accent);color:white;font-weight:650;cursor:pointer}button.secondary{background:var(--soft);color:var(--ink)}button.remove{background:#fee2e2;color:#991b1b;padding:8px 11px}input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:white;color:#172554}.grade{display:grid;grid-template-columns:1fr 120px 110px;gap:10px;margin:10px 0;align-items:center}.grade small{color:var(--muted)}.result{background:var(--soft);border-radius:16px;padding:18px;text-align:center}.big{font-size:42px;font-weight:800}.muted{color:var(--muted)}.hidden{display:none}.notice{font-size:13px;color:var(--muted);text-align:center;margin-top:18px}@media(max-width:560px){.grade{grid-template-columns:1fr 100px}.grade .weight{grid-column:1}.grade button{grid-column:2;grid-row:2}.card{padding:16px}}
-</style></head>
-<body><main class="wrap"><header><h1>📚 Promedio de Notas</h1><p>Calcula tus calificaciones y conoce cómo vas en clase.</p></header>
-<section class="card"><h2>1. Configura tu cálculo</h2><div class="mode"><label><input type="radio" name="mode" value="equal" checked> Todas las notas valen igual</label><label><input type="radio" name="mode" value="weighted"> Notas con porcentajes</label></div><p class="muted">Escala de 0.0 a 5.0 · Aprobación desde 3.0</p></section>
-<section class="card"><div class="row"><h2>2. Ingresa tus notas</h2><button id="add" class="secondary">＋ Agregar nota</button></div><div id="grades"></div><div class="row"><button id="calculate">Calcular promedio</button><button id="clear" class="secondary">Limpiar</button></div></section>
-<section class="card"><h2>3. Resultado</h2><div class="result"><div class="muted">Tu promedio actual</div><div class="big" id="average">—</div><strong id="status">Agrega tus notas para comenzar</strong></div><div id="needed" class="hidden"><h3>Nota necesaria para llegar a 3.0</h3><p id="neededText"></p></div></section>
-<p class="notice">Tus datos se guardan únicamente en este navegador. No se envían a ningún servidor.</p></main>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#172554">
+  <meta name="description" content="Calcula tu promedio de notas, descubre cuánto necesitas para aprobar y organiza tus evaluaciones gratis.">
+  <meta property="og:title" content="Promedio de Notas">
+  <meta property="og:description" content="Calcula tu promedio académico y la nota que necesitas para llegar a 3.0.">
+  <meta property="og:type" content="website">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <title>Promedio de Notas | Calculadora académica gratis</title>
+  <style>
+    :root{color-scheme:light;--bg:#f4f7fc;--card:#fff;--ink:#172554;--muted:#64748b;--line:#dbe3f0;--accent:#3157d5;--accent-dark:#2445b4;--soft:#eaf0ff;--good:#087443;--bad:#b42318}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .wrap{max-width:900px;margin:auto;padding:28px 16px 40px}header{text-align:center;margin:8px 0 24px}header h1{font-size:clamp(29px,5vw,42px);line-height:1.15;margin:0}header p{color:var(--muted);margin:10px auto 0;max-width:620px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;margin:15px 0;box-shadow:0 8px 28px #1725540a}
+    h2{font-size:20px;margin:0 0 14px}h3{font-size:17px;margin:18px 0 6px}.muted{color:var(--muted)}.small{font-size:13px}
+    .mode{display:flex;gap:10px;flex-wrap:wrap}.mode label{display:flex;gap:8px;align-items:center;background:var(--soft);padding:10px 13px;border-radius:12px;cursor:pointer}.mode input{width:auto}
+    button,input{font:inherit}button{border:0;border-radius:11px;padding:11px 16px;background:var(--accent);color:white;font-weight:650;cursor:pointer}button:hover{background:var(--accent-dark)}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #91aaff;outline-offset:2px}button.secondary{background:var(--soft);color:var(--ink)}button.secondary:hover{background:#dce6ff}button.remove{background:#fff0ef;color:var(--bad);padding:8px 10px}
+    input[type=text],input[type=number]{width:100%;min-width:0;padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+    .grade-head,.grade{display:grid;grid-template-columns:minmax(0,1fr) 125px 105px 86px;gap:9px;align-items:center}.grade-head{font-size:12px;color:var(--muted);font-weight:700;padding:0 2px}.grade{margin:9px 0}.grade .weight{display:none}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.actions button{flex:1}.result{background:var(--soft);border-radius:15px;padding:18px;text-align:center}.result-label{color:var(--muted);font-size:14px}.big{font-size:clamp(38px,8vw,52px);font-weight:800;line-height:1.2;margin:5px 0}.status{font-weight:700}.good{color:var(--good)}.bad{color:var(--bad)}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.stat{border:1px solid var(--line);border-radius:12px;padding:12px}.stat strong{display:block;font-size:20px}.hidden{display:none!important}
+    .hint{background:#f8fafc;border-left:3px solid var(--accent);padding:10px 12px;border-radius:8px;color:var(--muted);font-size:13px;margin:12px 0 0}.install-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}.footer{color:var(--muted);font-size:13px;text-align:center;padding:12px}.footer a{color:var(--accent);text-decoration:none;margin:0 7px}.footer a:hover{text-decoration:underline}
+    @media(max-width:620px){.card{padding:16px}.grade-head{display:none}.grade{grid-template-columns:minmax(0,1fr) 95px 78px}.grade .name{grid-column:1/-1}.grade .weight{grid-column:2}.grade button{grid-column:3;grid-row:2}.grade.weighted .weight{display:block}.stats{grid-template-columns:1fr 1fr}}
+    @media(min-width:621px){.grade.weighted .weight{display:block}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>📚 Promedio de Notas</h1>
+    <p>Calcula tu promedio, organiza tus evaluaciones y descubre qué calificación necesitas para alcanzar la meta.</p>
+    <div class="install-row"><button id="installBtn" class="secondary hidden" type="button">Instalar aplicación</button></div>
+  </header>
+
+  <section class="card" aria-labelledby="configTitle">
+    <h2 id="configTitle">1. Configura el cálculo</h2>
+    <div class="mode">
+      <label><input type="radio" name="mode" value="equal" checked> Todas las notas valen igual</label>
+      <label><input type="radio" name="mode" value="weighted"> Notas con porcentajes</label>
+    </div>
+    <p class="muted small">Escala de 0.0 a 5.0 · Meta de aprobación: 3.0. Puedes cambiar la meta más adelante en una versión futura.</p>
+  </section>
+
+  <section class="card" aria-labelledby="gradesTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <h2 id="gradesTitle">2. Tus evaluaciones</h2>
+      <button id="addBtn" class="secondary" type="button">＋ Agregar nota</button>
+    </div>
+    <p class="muted small" id="modeHelp">Escribe las notas que ya tienes. Deja vacía la nota de las evaluaciones pendientes.</p>
+    <div class="grade-head" aria-hidden="true"><span>Evaluación</span><span>Nota (0 a 5)</span><span class="weightHead">Porcentaje</span><span></span></div>
+    <div id="grades" aria-live="polite"></div>
+    <div class="actions">
+      <button id="calculateBtn" type="button">Calcular promedio</button>
+      <button id="exportBtn" class="secondary" type="button">Exportar CSV</button>
+      <button id="clearBtn" class="secondary" type="button">Limpiar</button>
+    </div>
+    <p class="hint" id="weightHint">En el modo de porcentajes, asigna el peso de cada evaluación. Los porcentajes pendientes se consideran evaluaciones que aún no has presentado.</p>
+  </section>
+
+  <section class="card" aria-labelledby="resultTitle">
+    <h2 id="resultTitle">3. Tu resultado</h2>
+    <div class="result" aria-live="polite">
+      <div class="result-label">Promedio de las notas registradas</div>
+      <div class="big" id="average">—</div>
+      <div class="status" id="status">Agrega tus notas y calcula el resultado.</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="muted small">Notas registradas</span><strong id="completed">0</strong></div>
+      <div class="stat"><span class="muted small">Evaluaciones pendientes</span><strong id="pending">0</strong></div>
+    </div>
+    <div id="neededBox" class="hint hidden" aria-live="polite"></div>
+  </section>
+
+  <section class="card">
+    <h2>Privacidad y uso</h2>
+    <p class="muted small">Tus calificaciones se guardan en el almacenamiento de este navegador. No creamos una cuenta ni enviamos tus notas a nuestros servidores. Si borras los datos del navegador o cambias de dispositivo, puedes perder esa información.</p>
+    <p class="muted small">Esta herramienta es orientativa. Confirma los porcentajes y reglas de aprobación con tu institución educativa.</p>
+  </section>
+  <footer class="footer">
+    <a href="./sobre-nosotros.html">Sobre el proyecto</a>
+    <a href="./privacidad.html">Privacidad</a>
+    <a href="./terminos.html">Términos</a>
+    <p>© <span id="year"></span> Promedio de Notas</p>
+  </footer>
+</main>
 <script>
-const $=s=>document.querySelector(s), grades=$("#grades");let rows=[];
-function mode(){return document.querySelector('input[name="mode"]:checked').value}
-function addRow(name="",grade="",weight=""){const id=Date.now()+Math.random();const el=document.createElement("div");el.className="grade";el.dataset.id=id;el.innerHTML='<input class="name" aria-label="Nombre de evaluación" placeholder="Ej. Parcial 1"><input class="score" type="number" min="0" max="5" step=".1" placeholder="Nota"><input class="weight" type="number" min="0" max="100" step="1" placeholder="%"><button class="remove" type="button">Quitar</button>';el.querySelector(".name").value=name;el.querySelector(".score").value=grade;el.querySelector(".weight").value=weight;el.querySelector(".remove").onclick=()=>{el.remove();save()};grades.append(el);updateMode()}
-function updateMode(){document.querySelectorAll(".weight").forEach(x=>x.style.display=mode()==="weighted"?"block":"none")}
-function save(){localStorage.setItem("promedio-notas-v1",JSON.stringify([...grades.children].map(e=>[e.querySelector(".name").value,e.querySelector(".score").value,e.querySelector(".weight").value])))}
-function calculate(){const els=[...grades.children];if(!els.length){alert("Agrega al menos una nota.");return}const vals=els.map(e=>({n:e.querySelector(".name").value,g:Number(e.querySelector(".score").value),w:Number(e.querySelector(".weight").value)}));if(vals.some(v=>!Number.isFinite(v.g)||v.g<0||v.g>5)){alert("Todas las notas deben estar entre 0.0 y 5.0.");return}let avg;if(mode()==="weighted"){if(vals.some(v=>!Number.isFinite(v.w)||v.w<0)||Math.abs(vals.reduce((s,v)=>s+v.w,0)-100)>.01){alert("Los porcentajes deben sumar exactamente 100%.");return}avg=vals.reduce((s,v)=>s+v.g*v.w/100,0)}else avg=vals.reduce((s,v)=>s+v.g,0)/vals.length;$("#average").textContent=avg.toFixed(2);$("#status").textContent=avg>=3?"¡Vas aprobando!":"Todavía estás por debajo de 3.0";$("#needed").classList.remove("hidden");if(mode()==="equal"){$("#neededText").textContent="Tu promedio actual es "+avg.toFixed(2)+". Agrega más notas para ver cómo cambia."}else{const total=vals.reduce((s,v)=>s+v.w,0);$("#neededText").textContent=avg>=3?"Ya alcanzaste la nota mínima.":"Revisa tus porcentajes: el cálculo actual usa todas las evaluaciones registradas."}save()}
-$("#add").onclick=()=>addRow();$("#calculate").onclick=calculate;$("#clear").onclick=()=>{if(confirm("¿Borrar todas las notas?")){grades.innerHTML="";addRow();$("#average").textContent="—";$("#status").textContent="Agrega tus notas para comenzar";$("#needed").classList.add("hidden");save()}};document.querySelectorAll('input[name="mode"]').forEach(x=>x.onchange=()=>{updateMode();save()});grades.addEventListener("input",save);
-try{const saved=JSON.parse(localStorage.getItem("promedio-notas-v1")||"[]");saved.length?saved.forEach(v=>addRow(...v)):addRow()}catch{addRow()}
-if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
-</script></body></html>
+(() => {
+  "use strict";
+  const TARGET = 3;
+  const KEY = "promedio-notas-v2";
+  const $ = (selector) => document.querySelector(selector);
+  const gradesEl = $("#grades");
+  let installPrompt = null;
+
+  function currentMode() {
+    return document.querySelector('input[name="mode"]:checked').value;
+  }
+
+  function addRow(name = "", grade = "", weight = "") {
+    const row = document.createElement("div");
+    row.className = "grade";
+    row.innerHTML = '<input class="name" type="text" maxlength="60" aria-label="Nombre de la evaluación" placeholder="Ej. Parcial 1">' +
+      '<input class="score" type="number" min="0" max="5" step="0.1" inputmode="decimal" aria-label="Nota de la evaluación" placeholder="0.0 a 5.0">' +
+      '<input class="weight" type="number" min="0" max="100" step="0.1" inputmode="decimal" aria-label="Porcentaje de la evaluación" placeholder="%">' +
+      '<button class="remove" type="button" aria-label="Quitar evaluación">Quitar</button>';
+    row.querySelector(".name").value = name;
+    row.querySelector(".score").value = grade;
+    row.querySelector(".weight").value = weight;
+    row.querySelector(".remove").addEventListener("click", () => {
+      row.remove();
+      if (!gradesEl.children.length) addRow();
+      save();
+      resetResult();
+    });
+    gradesEl.append(row);
+    applyMode();
+  }
+
+  function applyMode() {
+    const weighted = currentMode() === "weighted";
+    [...gradesEl.children].forEach(row => row.classList.toggle("weighted", weighted));
+    $(".weightHead").textContent = weighted ? "Porcentaje" : "";
+    $("#weightHint").classList.toggle("hidden", !weighted);
+    $("#modeHelp").textContent = weighted
+      ? "Asigna el porcentaje de cada evaluación. Deja vacía la nota si todavía no la has presentado."
+      : "Escribe las notas que ya tienes. Deja vacía la nota de las evaluaciones pendientes.";
+    save();
+  }
+
+  function collect() {
+    return [...gradesEl.children].map((row, index) => ({
+      name: row.querySelector(".name").value.trim() || "Evaluación " + (index + 1),
+      rawGrade: row.querySelector(".score").value.trim(),
+      rawWeight: row.querySelector(".weight").value.trim()
+    }));
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({mode: currentMode(), grades: collect()}));
+    } catch (error) {
+      console.warn("No fue posible guardar en este navegador.", error);
+    }
+  }
+
+  function resetResult() {
+    $("#average").textContent = "—";
+    $("#status").textContent = "Actualiza tus notas y vuelve a calcular.";
+    $("#status").className = "status";
+    $("#completed").textContent = "0";
+    $("#pending").textContent = "0";
+    $("#neededBox").classList.add("hidden");
+  }
+
+  function showError(message) {
+    $("#status").textContent = message;
+    $("#status").className = "status bad";
+    $("#neededBox").classList.add("hidden");
+  }
+
+  function calculate() {
+    const entries = collect();
+    const completed = entries.filter(e => e.rawGrade !== "");
+    if (!completed.length) {
+      showError("Ingresa al menos una nota para calcular tu promedio.");
+      return;
+    }
+    for (const e of entries) {
+      if (e.rawGrade !== "") {
+        const grade = Number(e.rawGrade);
+        if (!Number.isFinite(grade) || grade < 0 || grade > 5) {
+          showError("Cada nota debe estar entre 0.0 y 5.0.");
+          return;
+        }
+      }
+    }
+
+    let average, pendingCount, needed, summary;
+    if (currentMode() === "equal") {
+      pendingCount = entries.length - completed.length;
+      const sum = completed.reduce((total, e) => total + Number(e.rawGrade), 0);
+      average = sum / completed.length;
+      if (pendingCount > 0) {
+        needed = (TARGET * entries.length - sum) / pendingCount;
+        summary = needed <= 0
+          ? "¡Ya alcanzaste la meta de 3.0! Puedes obtener cualquier nota entre 0.0 y 5.0 en las evaluaciones pendientes y conservarás un promedio final de al menos 3.0."
+          : needed > 5
+            ? "Para terminar con 3.0 necesitarías un promedio de " + needed.toFixed(2) + " en las evaluaciones pendientes. No es posible alcanzar esa meta solo con las evaluaciones restantes."
+            : "Para terminar con un promedio de 3.0, necesitas obtener " + needed.toFixed(2) + " de promedio en las " + pendingCount + " evaluación(es) pendiente(s).";
+      } else {
+        summary = average >= TARGET ? "Ya terminaste las evaluaciones registradas y alcanzaste la meta." : "Con las evaluaciones registradas, tu promedio final está por debajo de 3.0.";
+      }
+    } else {
+      const parsed = entries.map(e => ({
+        ...e,
+        grade: e.rawGrade === "" ? null : Number(e.rawGrade),
+        weight: e.rawWeight === "" ? NaN : Number(e.rawWeight)
+      }));
+      if (parsed.some(e => !Number.isFinite(e.weight) || e.weight <= 0 || e.weight > 100)) {
+        showError("Asigna a cada evaluación un porcentaje mayor que 0 y hasta 100.");
+        return;
+      }
+      const totalWeight = parsed.reduce((sum, e) => sum + e.weight, 0);
+      if (totalWeight > 100.001) {
+        showError("La suma de los porcentajes no puede superar el 100%.");
+        return;
+      }
+      const done = parsed.filter(e => e.grade !== null);
+      const completedWeight = done.reduce((sum, e) => sum + e.weight, 0);
+      const weightedPoints = done.reduce((sum, e) => sum + e.grade * e.weight / 100, 0);
+      if (completedWeight <= 0) {
+        showError("Ingresa al menos una nota y su porcentaje.");
+        return;
+      }
+      average = weightedPoints / (completedWeight / 100);
+      const remainingWeight = 100 - completedWeight;
+      pendingCount = parsed.length - done.length + (100 - totalWeight > 0.001 ? 1 : 0);
+      if (remainingWeight > 0.001) {
+        needed = (TARGET - weightedPoints) / (remainingWeight / 100);
+        summary = needed <= 0
+          ? "¡Ya tienes los puntos necesarios para alcanzar 3.0! Las notas pendientes no bajarán tu promedio por debajo de la meta si están dentro de la escala."
+          : needed > 5
+            ? "Necesitarías un promedio de " + needed.toFixed(2) + " en el " + remainingWeight.toFixed(1) + "% pendiente. No es posible alcanzar 3.0 con la escala actual."
+            : "Necesitas un promedio de " + needed.toFixed(2) + " en el " + remainingWeight.toFixed(1) + "% que falta para terminar con 3.0.";
+      } else {
+        summary = average >= TARGET ? "Ya completaste el 100% y alcanzaste la meta." : "Ya completaste el 100%, pero el promedio final está por debajo de 3.0.";
+      }
+    }
+
+    $("#average").textContent = average.toFixed(2);
+    $("#status").textContent = average >= TARGET ? "Tu promedio actual está en 3.0 o más." : "Tu promedio actual está por debajo de 3.0.";
+    $("#status").className = "status " + (average >= TARGET ? "good" : "bad");
+    $("#completed").textContent = String(completed.length);
+    $("#pending").textContent = String(pendingCount);
+    $("#neededBox").textContent = summary;
+    $("#neededBox").classList.remove("hidden");
+    save();
+  }
+
+  function exportCsv() {
+    const entries = collect();
+    if (!entries.length) return;
+    const rows = [["Evaluación", "Nota", "Porcentaje"], ...entries.map(e => [e.name, e.rawGrade, currentMode() === "weighted" ? e.rawWeight : ""])];
+    const csv = rows.map(row => row.map(value => '"' + String(value).replace(/"/g, '""') + '"').join(";")).join("\r\n");
+    const blob = new Blob(["\uFEFF" + csv], {type: "text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "mis-notas.csv";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  $("#addBtn").addEventListener("click", () => { addRow(); save(); });
+  $("#calculateBtn").addEventListener("click", calculate);
+  $("#exportBtn").addEventListener("click", exportCsv);
+  $("#clearBtn").addEventListener("click", () => {
+    if (!confirm("¿Seguro que quieres borrar todas las evaluaciones guardadas en este navegador?")) return;
+    gradesEl.innerHTML = "";
+    addRow();
+    resetResult();
+    save();
+  });
+  document.querySelectorAll('input[name="mode"]').forEach(input => input.addEventListener("change", () => {
+    applyMode();
+    resetResult();
+  }));
+  gradesEl.addEventListener("input", () => { save(); resetResult(); });
+
+  try {
+    const stored = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (stored && Array.isArray(stored.grades)) {
+      document.querySelector('input[name="mode"][value="' + (stored.mode === "weighted" ? "weighted" : "equal") + '"]').checked = true;
+      stored.grades.forEach(e => addRow(String(e.name || ""), String(e.rawGrade ?? ""), String(e.rawWeight ?? "")));
+    } else {
+      const old = JSON.parse(localStorage.getItem("promedio-notas-v1") || "[]");
+      if (Array.isArray(old) && old.length) old.forEach(e => addRow(String(e[0] || ""), String(e[1] || ""), String(e[2] || "")));
+      else addRow();
+    }
+    applyMode();
+  } catch (error) {
+    addRow();
+  }
+  $("#year").textContent = new Date().getFullYear();
+
+  window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
+    installPrompt = event;
+    $("#installBtn").classList.remove("hidden");
+  });
+  $("#installBtn").addEventListener("click", async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null;
+    $("#installBtn").classList.add("hidden");
+  });
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(error => console.warn("No se pudo activar el modo sin conexión.", error)));
+  }
+})();
+</script>
+</body>
+</html>

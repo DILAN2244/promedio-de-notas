@@ -1,12 +1,18 @@
 {
   "name": "Promedio de Notas",
-  "short_name": "Mis Notas",
+  "short_name": "Promedio",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f3f6fc",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f7fc",
   "theme_color": "#172554",
-  "description": "Calculadora de promedio académico",
+  "description": "Calcula tu promedio académico y descubre qué nota necesitas para aprobar.",
+  "categories": [
+    "education",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "./icon.svg",

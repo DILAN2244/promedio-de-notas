@@ -1,19 +1,29 @@
 # Promedio de Notas
 
-Aplicación web progresiva (PWA) para calcular promedios académicos. Funciona en móvil y computador y puede instalarse desde el navegador.
+Calculadora académica gratuita y aplicación web progresiva (PWA).
 
-## Publicación
-1. En GitHub abre **Settings → Pages**.
+## Funciones
+- Promedio simple con evaluaciones completadas y pendientes.
+- Promedio ponderado por porcentajes.
+- Estimación de la nota promedio necesaria para alcanzar 3.0.
+- Guardado local en el navegador.
+- Exportación de notas a CSV.
+- Diseño adaptable a celular y computador.
+- Caché para uso sin conexión después de la primera visita.
+
+## Publicación con GitHub Pages
+1. Abre **Settings → Pages**.
 2. En **Build and deployment**, selecciona **Deploy from a branch**.
-3. Selecciona la rama **main** y la carpeta **/(root)**; guarda.
-4. Espera a que GitHub Pages publique el sitio.
+3. Elige la rama **main** y la carpeta **/(root)** y guarda.
+4. Espera a que finalice la publicación.
 
-La dirección será: https://dilan2244.github.io/promedio-de-notas/
+URL esperada: https://dilan2244.github.io/promedio-de-notas/
 
-## Instalación
-Abre el enlace publicado desde Chrome/Edge y usa **Instalar aplicación** o **Añadir a pantalla de inicio**. En iPhone, usa Compartir → Añadir a pantalla de inicio.
+## Privacidad
+Las notas se guardan en LocalStorage del navegador. No hay cuentas, backend ni sincronización en esta versión. Consulta [Política de privacidad](./privacidad.html) y [Términos de uso](./terminos.html).
 
 ## Tecnologías
 HTML, CSS, JavaScript, LocalStorage, Web App Manifest y Service Worker.
 
-**Privacidad:** las notas se almacenan localmente en el navegador y no se sincronizan entre dispositivos.
+## Monetización
+Esta versión todavía no contiene anuncios, pagos ni funciones premium. Antes de incorporar publicidad, revisa las políticas del proveedor, privacidad, consentimiento aplicable y requisitos de edad de la cuenta publicitaria. No se deben presentar funciones como premium hasta que estén implementadas y probadas.
