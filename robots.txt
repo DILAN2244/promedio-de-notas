@@ -1,1 +1,3 @@
-User-agent: *\nAllow: /\nSitemap: https://dilan2244.github.io/promedio-de-notas/sitemap.xml\n
+User-agent: *
+Allow: /
+Sitemap: https://dilan2244.github.io/promedio-de-notas/sitemap.xml

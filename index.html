@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#172554">
   <meta name="description" content="Calcula tu promedio de notas, descubre cuánto necesitas para aprobar y organiza tus evaluaciones gratis.">
+  <link rel="canonical" href="https://dilan2244.github.io/promedio-de-notas/">
   <meta property="og:title" content="Promedio de Notas">
   <meta property="og:description" content="Calcula tu promedio académico y la nota que necesitas para llegar a 3.0.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://dilan2244.github.io/promedio-de-notas/">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <title>Promedio de Notas | Calculadora académica gratis</title>
@@ -80,7 +82,8 @@
     <p class="muted small">Esta herramienta es orientativa. Confirma los porcentajes y reglas de aprobación con tu institución educativa.</p>
   </section>
   <footer class="footer">
-    <a href="./guia.html">Guía y preguntas</a>\n    <a href="./sobre-nosotros.html">Sobre el proyecto</a>
+    <a href="./guia.html">Guía y preguntas</a>
+    <a href="./sobre-nosotros.html">Sobre el proyecto</a>
     <a href="./privacidad.html">Privacidad</a>
     <a href="./terminos.html">Términos</a>
     <p>© <span id="year"></span> Promedio de Notas</p>
@@ -99,6 +102,18 @@
     return document.querySelector('input[name="mode"]:checked').value;
   }
 
+  function labelRows() {
+    [...gradesEl.children].forEach((row, index) => {
+      const number = index + 1;
+      row.setAttribute("role", "group");
+      row.setAttribute("aria-label", "Evaluación " + number);
+      row.querySelector(".name").setAttribute("aria-label", "Nombre de la evaluación " + number);
+      row.querySelector(".score").setAttribute("aria-label", "Nota de la evaluación " + number);
+      row.querySelector(".weight").setAttribute("aria-label", "Porcentaje de la evaluación " + number);
+      row.querySelector(".remove").setAttribute("aria-label", "Quitar evaluación " + number);
+    });
+  }
+
   function addRow(name = "", grade = "", weight = "") {
     const row = document.createElement("div");
     row.className = "grade";
@@ -112,10 +127,12 @@
     row.querySelector(".remove").addEventListener("click", () => {
       row.remove();
       if (!gradesEl.children.length) addRow();
+      labelRows();
       save();
       resetResult();
     });
     gradesEl.append(row);
+    labelRows();
     applyMode();
   }
 
@@ -244,7 +261,12 @@
     const entries = collect();
     if (!entries.length) return;
     const rows = [["Evaluación", "Nota", "Porcentaje"], ...entries.map(e => [e.name, e.rawGrade, currentMode() === "weighted" ? e.rawWeight : ""])];
-    const csv = rows.map(row => row.map(value => '"' + String(value).replace(/"/g, '""') + '"').join(";")).join("\r\n");
+    const csvCell = value => {
+      const text = String(value);
+      const safe = /^[\u0000-\u0020]*[=+\-@]/.test(text) ? "'" + text : text;
+      return '"' + safe.replace(/"/g, '""') + '"';
+    };
+    const csv = rows.map(row => row.map(csvCell).join(";")).join("\r\n");
     const blob = new Blob(["\uFEFF" + csv], {type: "text/csv;charset=utf-8"});
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -253,7 +275,7 @@
     document.body.append(link);
     link.click();
     link.remove();
-    URL.revokeObjectURL(url);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   $("#addBtn").addEventListener("click", () => { addRow(); save(); });
