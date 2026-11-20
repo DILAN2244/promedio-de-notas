@@ -5,7 +5,7 @@ Calculadora académica gratuita y aplicación web progresiva (PWA).
 ## Funciones
 - Promedio simple con evaluaciones completadas y pendientes.
 - Promedio ponderado por porcentajes.
-- Estimación de la nota promedio necesaria para alcanzar 3.0.
+- Estimación de la nota promedio necesaria para alcanzar una meta configurable (3.0 por defecto).
 - Guardado local en el navegador.
 - Exportación de notas a CSV.
 - Guía educativa con ejemplos y preguntas frecuentes.
@@ -31,6 +31,7 @@ Esta versión todavía no contiene anuncios, pagos ni funciones premium. Antes d
 
 ## Comprobaciones manuales recomendadas
 
+- Meta configurable: cambiarla a 4.0 debe actualizar el texto y el cálculo de nota necesaria; al recargar, la meta debe conservarse.
 - Promedio simple: 4.0, 3.0 y 5.0 deben dar 4.00.
 - Promedio ponderado: 4.0 al 40% y 3.0 al 60% deben dar 3.40.
 - Nota pendiente: 4.0 al 40% y 60% restante deben requerir 2.33 para llegar a 3.0.
