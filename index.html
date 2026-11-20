@@ -24,6 +24,7 @@
     input[type=text],input[type=number]{width:100%;min-width:0;padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
     .grade-head,.grade{display:grid;grid-template-columns:minmax(0,1fr) 125px 105px 86px;gap:9px;align-items:center}.grade-head{font-size:12px;color:var(--muted);font-weight:700;padding:0 2px}.grade{margin:9px 0}.grade .weight{display:none}
     .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.actions button{flex:1}.result{background:var(--soft);border-radius:15px;padding:18px;text-align:center}.result-label{color:var(--muted);font-size:14px}.big{font-size:clamp(38px,8vw,52px);font-weight:800;line-height:1.2;margin:5px 0}.status{font-weight:700}.good{color:var(--good)}.bad{color:var(--bad)}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.stat{border:1px solid var(--line);border-radius:12px;padding:12px}.stat strong{display:block;font-size:20px}.hidden{display:none!important}
+    .target-setting{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}.target-setting label{font-weight:650}.target-setting input{width:110px}
     .hint{background:#f8fafc;border-left:3px solid var(--accent);padding:10px 12px;border-radius:8px;color:var(--muted);font-size:13px;margin:12px 0 0}.install-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}.footer{color:var(--muted);font-size:13px;text-align:center;padding:12px}.footer a{color:var(--accent);text-decoration:none;margin:0 7px}.footer a:hover{text-decoration:underline}
     @media(max-width:620px){.card{padding:16px}.grade-head{display:none}.grade{grid-template-columns:minmax(0,1fr) 95px 78px}.grade .name{grid-column:1/-1}.grade .weight{grid-column:2}.grade button{grid-column:3;grid-row:2}.grade.weighted .weight{display:block}.stats{grid-template-columns:1fr 1fr}}
     @media(min-width:621px){.grade.weighted .weight{display:block}}
@@ -43,7 +44,8 @@
       <label><input type="radio" name="mode" value="equal" checked> Todas las notas valen igual</label>
       <label><input type="radio" name="mode" value="weighted"> Notas con porcentajes</label>
     </div>
-    <p class="muted small">Escala de 0.0 a 5.0 · Meta de aprobación: 3.0. Puedes cambiar la meta más adelante en una versión futura.</p>
+    <p class="muted small">Escala de 0.0 a 5.0. Define la meta que quieres alcanzar.</p>
+    <div class="target-setting"><label for="targetInput">Meta de promedio (0.0 a 5.0)</label><input id="targetInput" type="number" min="0" max="5" step="0.1" value="3.0" inputmode="decimal"></div>
   </section>
 
   <section class="card" aria-labelledby="gradesTitle">
@@ -92,7 +94,7 @@
 <script>
 (() => {
   "use strict";
-  const TARGET = 3;
+  let target = 3;
   const KEY = "promedio-notas-v2";
   const $ = (selector) => document.querySelector(selector);
   const gradesEl = $("#grades");
@@ -100,6 +102,10 @@
 
   function currentMode() {
     return document.querySelector('input[name="mode"]:checked').value;
+  }
+
+  function targetText() {
+    return target.toFixed(1);
   }
 
   function labelRows() {
@@ -157,7 +163,7 @@
 
   function save() {
     try {
-      localStorage.setItem(KEY, JSON.stringify({mode: currentMode(), grades: collect()}));
+      localStorage.setItem(KEY, JSON.stringify({mode: currentMode(), target, grades: collect()}));
     } catch (error) {
       console.warn("No fue posible guardar en este navegador.", error);
     }
@@ -201,14 +207,14 @@
       const sum = completed.reduce((total, e) => total + Number(e.rawGrade), 0);
       average = sum / completed.length;
       if (pendingCount > 0) {
-        needed = (TARGET * entries.length - sum) / pendingCount;
+        needed = (target * entries.length - sum) / pendingCount;
         summary = needed <= 0
-          ? "¡Ya alcanzaste la meta de 3.0! Puedes obtener cualquier nota entre 0.0 y 5.0 en las evaluaciones pendientes y conservarás un promedio final de al menos 3.0."
+          ? "¡Ya alcanzaste la meta de " + targetText() + "! Puedes obtener cualquier nota entre 0.0 y 5.0 en las evaluaciones pendientes y conservarás un promedio final de al menos " + targetText() + "."
           : needed > 5
             ? "Para terminar con 3.0 necesitarías un promedio de " + needed.toFixed(2) + " en las evaluaciones pendientes. No es posible alcanzar esa meta solo con las evaluaciones restantes."
-            : "Para terminar con un promedio de 3.0, necesitas obtener " + needed.toFixed(2) + " de promedio en las " + pendingCount + " evaluación(es) pendiente(s).";
+            : "Para terminar con un promedio de " + targetText() + ", necesitas obtener " + needed.toFixed(2) + " de promedio en las " + pendingCount + " evaluación(es) pendiente(s).";
       } else {
-        summary = average >= TARGET ? "Ya terminaste las evaluaciones registradas y alcanzaste la meta." : "Con las evaluaciones registradas, tu promedio final está por debajo de 3.0.";
+        summary = average >= target ? "Ya terminaste las evaluaciones registradas y alcanzaste la meta." : "Con las evaluaciones registradas, tu promedio final está por debajo de " + targetText() + ".";
       }
     } else {
       const parsed = entries.map(e => ({
@@ -236,20 +242,20 @@
       const remainingWeight = 100 - completedWeight;
       pendingCount = parsed.length - done.length + (100 - totalWeight > 0.001 ? 1 : 0);
       if (remainingWeight > 0.001) {
-        needed = (TARGET - weightedPoints) / (remainingWeight / 100);
+        needed = (target - weightedPoints) / (remainingWeight / 100);
         summary = needed <= 0
-          ? "¡Ya tienes los puntos necesarios para alcanzar 3.0! Las notas pendientes no bajarán tu promedio por debajo de la meta si están dentro de la escala."
+          ? "¡Ya tienes los puntos necesarios para alcanzar " + targetText() + "! Las notas pendientes no bajarán tu promedio por debajo de la meta si están dentro de la escala."
           : needed > 5
             ? "Necesitarías un promedio de " + needed.toFixed(2) + " en el " + remainingWeight.toFixed(1) + "% pendiente. No es posible alcanzar 3.0 con la escala actual."
-            : "Necesitas un promedio de " + needed.toFixed(2) + " en el " + remainingWeight.toFixed(1) + "% que falta para terminar con 3.0.";
+            : "Necesitas un promedio de " + needed.toFixed(2) + " en el " + remainingWeight.toFixed(1) + "% que falta para terminar con " + targetText() + ".";
       } else {
-        summary = average >= TARGET ? "Ya completaste el 100% y alcanzaste la meta." : "Ya completaste el 100%, pero el promedio final está por debajo de 3.0.";
+        summary = average >= target ? "Ya completaste el 100% y alcanzaste la meta." : "Ya completaste el 100%, pero el promedio final está por debajo de " + targetText() + ".";
       }
     }
 
     $("#average").textContent = average.toFixed(2);
-    $("#status").textContent = average >= TARGET ? "Tu promedio actual está en 3.0 o más." : "Tu promedio actual está por debajo de 3.0.";
-    $("#status").className = "status " + (average >= TARGET ? "good" : "bad");
+    $("#status").textContent = average >= target ? "Tu promedio actual está en " + targetText() + " o más." : "Tu promedio actual está por debajo de " + targetText() + ".";
+    $("#status").className = "status " + (average >= target ? "good" : "bad");
     $("#completed").textContent = String(completed.length);
     $("#pending").textContent = String(pendingCount);
     $("#neededBox").textContent = summary;
@@ -279,6 +285,19 @@
   }
 
   $("#addBtn").addEventListener("click", () => { addRow(); save(); });
+  $("#targetInput").addEventListener("change", () => {
+    const rawValue = $("#targetInput").value.trim();
+    const value = Number(rawValue);
+    if (rawValue === "" || !Number.isFinite(value) || value < 0 || value > 5) {
+      $("#targetInput").value = targetText();
+      showError("La meta debe estar entre 0.0 y 5.0.");
+      return;
+    }
+    target = Math.round(value * 10) / 10;
+    $("#targetInput").value = targetText();
+    save();
+    resetResult();
+  });
   $("#calculateBtn").addEventListener("click", calculate);
   $("#exportBtn").addEventListener("click", exportCsv);
   $("#clearBtn").addEventListener("click", () => {
@@ -297,15 +316,20 @@
   try {
     const stored = JSON.parse(localStorage.getItem(KEY) || "null");
     if (stored && Array.isArray(stored.grades)) {
+      const savedTarget = Number(stored.target);
+      if (Number.isFinite(savedTarget) && savedTarget >= 0 && savedTarget <= 5) target = Math.round(savedTarget * 10) / 10;
+      $("#targetInput").value = targetText();
       document.querySelector('input[name="mode"][value="' + (stored.mode === "weighted" ? "weighted" : "equal") + '"]').checked = true;
       stored.grades.forEach(e => addRow(String(e.name || ""), String(e.rawGrade ?? ""), String(e.rawWeight ?? "")));
     } else {
+      $("#targetInput").value = targetText();
       const old = JSON.parse(localStorage.getItem("promedio-notas-v1") || "[]");
       if (Array.isArray(old) && old.length) old.forEach(e => addRow(String(e[0] || ""), String(e[1] || ""), String(e[2] || "")));
       else addRow();
     }
     applyMode();
   } catch (error) {
+    $("#targetInput").value = targetText();
     addRow();
   }
   $("#year").textContent = new Date().getFullYear();
